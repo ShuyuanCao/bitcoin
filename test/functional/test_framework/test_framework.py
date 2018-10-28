@@ -161,8 +161,10 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         success = TestStatus.FAILED
 
         try:
-            if self.options.usecli and not self.supports_cli:
-                raise SkipTest("--usecli specified but test does not support using CLI")
+            if self.options.usecli:
+                if not self.supports_cli:
+                    raise SkipTest("--usecli specified but test does not support using CLI")
+                self.skip_if_no_cli()
             self.skip_test_if_missing_module()
             self.setup_chain()
             self.setup_network()
@@ -525,7 +527,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         config = configparser.ConfigParser()
         config.read_file(open(self.options.configfile))
 
-        return config["components"].getboolean("ENABLE_UTILS")
+        return config["components"].getboolean("ENABLE_CLI")
 
     def is_wallet_compiled(self):
         """Checks whether the wallet module was compiled."""
